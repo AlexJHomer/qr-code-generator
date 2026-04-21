@@ -18,7 +18,9 @@ ui <- fluidPage(
         ),
         mainPanel(
            plotOutput("qrcode"),
-           downloadButton("save_file", "Download QR code (png)")
+           div(style = "text-align: center;",
+               downloadButton("save_file", "Download QR code (png)")
+           )
         )
     )
 )
