@@ -1,8 +1,10 @@
 library(shiny)
+library(shinyjs)
 library(qrcode)
 
 ui <- fluidPage(
 
+    useShinyjs(),
     titlePanel("QR code generator"),
 
     sidebarLayout(
@@ -18,6 +20,7 @@ ui <- fluidPage(
 )
 
 server <- function(input, output) {
+  runjs("$('#url').attr('maxlength',1000)")
 
     output$qrcode <- renderPlot({
         plot(qr_code(input$url))
