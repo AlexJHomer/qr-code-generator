@@ -64,7 +64,7 @@ server <- function(input, output) {
     output$save_file <- downloadHandler(
       filename = "qr_code.png",
       content = function(file) {
-        png(file, width = 2000, height = 2000)
+        png(file, width = 2000, height = 2000, bg = "#00000000")
         plot(chosen_code(), col = c(input$bg_colour, input$fg_colour))
         dev.off()
       }
