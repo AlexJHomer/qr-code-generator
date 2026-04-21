@@ -2,16 +2,19 @@ library(shiny)
 library(shinyjs)
 library(qrcode)
 
-ui <- fluidPage(
 
+ui <- fluidPage(
     useShinyjs(),
     titlePanel("QR code generator"),
-
     sidebarLayout(
         sidebarPanel(
             textInput("url",
                         "URL (or other text):",
-                        placeholder = "http://example.com")
+                        placeholder = "http://example.com"),
+            fileInput("logo",
+                        "Upload logo...",
+                        accept=c(".png", ".svg", ".jpg", ".jpeg")),
+            actionButton("reset", "Reset file upload")
         ),
         mainPanel(
            plotOutput("qrcode")
@@ -21,9 +24,27 @@ ui <- fluidPage(
 
 server <- function(input, output) {
   runjs("$('#url').attr('maxlength',1000)")
+    file_path <- reactiveVal()
+
+    observe({
+      file_path(input$logo$datapath)
+    })
+
+    observe({
+      file_path(NULL)
+      reset("logo")
+    }) |>
+      bindEvent(input$reset, ignoreInit = FALSE)
 
     output$qrcode <- renderPlot({
-        plot(qr_code(input$url))
+        if (is.null(file_path())) {
+          plot(qr_code(input$url))
+        } else {
+          input$url |>
+            qr_code(ecl = "H") |>
+            add_logo(logo = file_path(), ecl = "L") |>
+            plot()
+        }
     })
 }
 
