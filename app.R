@@ -1,7 +1,7 @@
 library(shiny)
 library(shinyjs)
 library(qrcode)
-
+library(colourpicker)
 
 ui <- fluidPage(
     useShinyjs(),
@@ -11,10 +11,18 @@ ui <- fluidPage(
             textInput("url",
                         "URL (or other text):",
                         placeholder = "http://example.com"),
+            colourInput("fg_colour",
+                        "Foreground colour",
+                        value = "black"),
+            colourInput("bg_colour",
+                        "Background colour",
+                        value = "white",
+                        allowTransparent = TRUE),
             fileInput("logo",
                         "Upload logo...",
                         accept=c(".png", ".svg", ".jpg", ".jpeg")),
             actionButton("reset", "Reset logo upload")
+
         ),
         mainPanel(
            plotOutput("qrcode"),
@@ -49,13 +57,15 @@ server <- function(input, output) {
       }
     })
 
-    output$qrcode <- renderPlot(plot(chosen_code()))
+    output$qrcode <- renderPlot(
+      plot(chosen_code(), col = c(input$bg_colour, input$fg_colour))
+    )
 
     output$save_file <- downloadHandler(
       filename = "qr_code.png",
       content = function(file) {
         png(file, width = 2000, height = 2000)
-        plot(chosen_code())
+        plot(chosen_code(), col = c(input$bg_colour, input$fg_colour))
         dev.off()
       }
     )
